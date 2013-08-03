@@ -78,6 +78,10 @@ namespace CruiseControl
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
                 }
+                else
+                {
+                    commands.Add(new Command() { vesselid = ship.Id, action = "move:north", });
+                }
             }
             return commands;
 
