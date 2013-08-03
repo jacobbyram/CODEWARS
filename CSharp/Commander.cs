@@ -44,22 +44,18 @@ namespace CruiseControl
                 if (minX <= 5 && minY <= 5)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:south",});
-                    break;
                 }
                 else if (minX <= 9 && minY <= 5)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:south",});
-                    break;
                 }
                 else if (minX <= 15 && minY <= 5)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:west",});
-                    break;
                 }
                 else if (minX <= 5 && minY <= 9)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:east",});
-                    break;
                 }
                 else if (minX <= 9 && minY <= 9)
                 {
@@ -69,22 +65,18 @@ namespace CruiseControl
                 else if (minX <= 15 && minY <= 9)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:west",});
-                    break;
                 }
                 else if (minX <= 5 && minY <= 15)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:east",});
-                    break;
                 }
                 else if (minX <= 9 && minY <= 15)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
-                    break;
                 }
                 else if (minX <= 9 && minY <= 15)
                 {
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
-                    break;
                 }
             }
 
