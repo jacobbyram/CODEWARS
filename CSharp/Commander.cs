@@ -16,7 +16,8 @@ namespace CruiseControl
         public Commander()
         {
             _currentBoard = new BoardStatus();
-            _commands = new List<Command>(); 
+            _commands = new List<Command>();
+            _maxCommandCount = 10;
         }
 
         // Add Commands Here.
@@ -66,6 +67,7 @@ namespace CruiseControl
                 }
                 else if (minX <= 9 && minY <= 9)
                 {
+                    AddCommand(new Command() { vesselid = ship.Id, action = "move:north", });
                     //chill out
                     //commands.Add(new Command() {vesselid = ship.Id, action = "move:east", });
                 }
@@ -87,7 +89,7 @@ namespace CruiseControl
                 }
                 else
                 {
-                    AddCommand(new Command() {vesselid = ship.Id, action = "move:north",});
+                    AddCommand(new Command() { vesselid = ship.Id, action = "move:north", });
                 }
             }
 
