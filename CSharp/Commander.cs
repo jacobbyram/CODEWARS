@@ -37,7 +37,6 @@ namespace CruiseControl
         // Do not alter/remove this method signature
         public List<Command> GiveCommands()
         {
-            return MoveSouth();
             var myShipsCoordinates = _currentBoard.MyVesselStatuses.SelectMany(a => a.Location);
 
             //move towards center (implement broadside move)
