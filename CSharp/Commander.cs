@@ -23,16 +23,21 @@ namespace CruiseControl
         // You can only give as many commands as you have un-sunk vessels. Powerup commands do not count against this number. 
         // You are free to use as many powerup commands at any time. Any additional commands you give (past the number of active vessels) will be ignored.
 
+        private List<Command> MoveSouth()
+        {
+            var commands = new List<Command>();
+            foreach (var ship in _currentBoard.MyVesselStatuses)
+            {
+                commands.Add(new Command() { vesselid = ship.Id, action = "move:south", });
+            }
+
+            return commands;
+        } 
+
         // Do not alter/remove this method signature
         public List<Command> GiveCommands()
         {
-            var commands = new List<Command>();
-
-            if (_currentBoard.TurnsUntilBoardShrink <= 2)
-            {
-
-            }
-
+            return MoveSouth();
             var myShipsCoordinates = _currentBoard.MyVesselStatuses.SelectMany(a => a.Location);
 
             //move towards center (implement broadside move)
@@ -107,6 +112,10 @@ namespace CruiseControl
                 }
             }
 
+            //fire on something you just hit
+
+
+
             //fire at something you can see
             foreach (var ship in _currentBoard.MyVesselStatuses)
             {
@@ -119,6 +128,7 @@ namespace CruiseControl
                 }
             }
 
+            //use powerups
             if (_currentBoard.MyPowerUps.Contains(PowerUpType.ExtraCounterMeasures))
             {
                 AddCommand(new Command() {action = "powerup:3"});
@@ -137,12 +147,11 @@ namespace CruiseControl
             }
 
 
-            //use powerups
 
 
 
 
-            return commands;
+            return _commands;
         }
 
         private void AddCommand( Command command)
