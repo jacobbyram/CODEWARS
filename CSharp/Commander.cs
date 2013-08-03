@@ -105,7 +105,7 @@ namespace CruiseControl
             //repair appropriately
             foreach (var ship in _currentBoard.MyVesselStatuses)
             {
-                if (ship.DamagedSections.Any(a => a))
+                if (ship.DamagedSections.Any(a => a) && ship.AllowRepair)
                 {
                     var damagedCoordinateIndex = ship.DamagedSections.IndexOf(true);
                     var damagedCoordinate = ship.Location[damagedCoordinateIndex];
