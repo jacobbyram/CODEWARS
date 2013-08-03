@@ -38,7 +38,6 @@ namespace CruiseControl
         // Do not alter/remove this method signature
         public List<Command> GiveCommands()
         {
-            return MoveSouth();
             var myShipsCoordinates = _currentBoard.MyVesselStatuses.SelectMany(a => a.Location);
 
             //move towards center (implement broadside move)
@@ -106,7 +105,7 @@ namespace CruiseControl
             //repair appropriately
             foreach (var ship in _currentBoard.MyVesselStatuses)
             {
-                if (ship.DamagedSections.Any())
+                if (ship.DamagedSections.Any(a => a))
                 {
                     var damagedCoordinateIndex = ship.DamagedSections.IndexOf(true);
                     var damagedCoordinate = ship.Location[damagedCoordinateIndex];
