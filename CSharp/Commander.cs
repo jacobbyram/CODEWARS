@@ -79,6 +79,7 @@ namespace CruiseControl
                     commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
                 }
             }
+            return commands;
 
 
             //load up some countermeasures
@@ -103,7 +104,6 @@ namespace CruiseControl
 
 
             //commands = commands.Take(_maxCommandCount).ToList();
-            return commands;
         }
 
         // Do NOT modify or remove! This is where you will receive the new board status after each round.
