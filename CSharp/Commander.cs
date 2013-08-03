@@ -1,4 +1,5 @@
-﻿using CruiseControl.Models;
+﻿using CruiseControl.Enums;
+using CruiseControl.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,12 @@ namespace CruiseControl
     {
         private BoardStatus _currentBoard;
         private int _maxCommandCount;
+        private List<Command> _commands = new List<Command>(); 
 
         public Commander()
         {
             _currentBoard = new BoardStatus();
+            _commands = new List<Command>(); 
         }
 
         // Add Commands Here.
@@ -27,12 +30,12 @@ namespace CruiseControl
 
             if (_currentBoard.TurnsUntilBoardShrink <= 2)
             {
-                
+
             }
 
             var myShipsCoordinates = _currentBoard.MyVesselStatuses.SelectMany(a => a.Location);
 
-            //move around
+            //move towards center (implement broadside move)
             foreach (var ship in _currentBoard.MyVesselStatuses)
             {
                 var loc = ship.Location;
@@ -43,19 +46,19 @@ namespace CruiseControl
 
                 if (minX <= 5 && minY <= 5)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:south",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:south",});
                 }
                 else if (minX <= 9 && minY <= 5)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:south",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:south",});
                 }
                 else if (minX <= 15 && minY <= 5)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:west",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:west",});
                 }
                 else if (minX <= 5 && minY <= 9)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:east",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:east",});
                 }
                 else if (minX <= 9 && minY <= 9)
                 {
@@ -64,63 +67,111 @@ namespace CruiseControl
                 }
                 else if (minX <= 15 && minY <= 9)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:west",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:west",});
                 }
                 else if (minX <= 5 && minY <= 15)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:east",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:east",});
                 }
                 else if (minX <= 9 && minY <= 15)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:north",});
                 }
                 else if (minX <= 9 && minY <= 15)
                 {
-                    commands.Add(new Command() {vesselid = ship.Id, action = "move:north",});
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:north",});
                 }
                 else
                 {
-                    commands.Add(new Command() { vesselid = ship.Id, action = "move:north", });
+                    AddCommand(new Command() {vesselid = ship.Id, action = "move:north",});
                 }
             }
-            return commands;
 
-
-            //load up some countermeasures
+            //load cms
             foreach (var ship in _currentBoard.MyVesselStatuses)
             {
                 if (!ship.CounterMeasuresLoaded && ship.CounterMeasures > 0)
                 {
-                    //commands.Add(new Command() { vesselid = ship.Id, action = "load_countermeasures" });
+                    AddCommand(new Command() {vesselid = ship.Id, action = "load_countermeasures",});
                 }
             }
 
-
-            foreach (var xx in _currentBoard.MyVesselStatuses.SelectMany(a => a.SonarReport))
+            //repair appropriately
+            foreach (var ship in _currentBoard.MyVesselStatuses)
             {
-                
+                if (ship.DamagedSections.Any())
+                {
+                    var damagedCoordinateIndex = ship.DamagedSections.IndexOf(true);
+                    var damagedCoordinate = ship.Location[damagedCoordinateIndex];
+                    AddCommand(new Command() {vesselid = ship.Id, action = "repair", coordinate = damagedCoordinate});
+                }
             }
 
-            while (commands.Count < _maxCommandCount)
+            //fire at something you can see
+            foreach (var ship in _currentBoard.MyVesselStatuses)
             {
-                //commands.Add(new Command { vesselid = 1, action = "fire", coordinate = new Coordinate { X = 1, Y = 1 } });
+                var sonarPings = ship.SonarReport;
+                var possibleTargets = sonarPings.Where(a => !myShipsCoordinates.Contains(a));
+
+                foreach (var possibleTarget in possibleTargets)
+                {
+                    AddCommand(new Command() {action = "fire", vesselid = ship.Id, coordinate = possibleTarget});
+                }
+            }
+
+            if (_currentBoard.MyPowerUps.Contains(PowerUpType.ExtraCounterMeasures))
+            {
+                AddCommand(new Command() {action = "powerup:3"});
+            }
+            else if (_currentBoard.MyPowerUps.Contains(PowerUpType.BoostRadar))
+            {
+
+            }
+            else if (_currentBoard.MyPowerUps.Contains(PowerUpType.ClusterMissle))
+            {
+
+            }
+            else if (_currentBoard.MyPowerUps.Contains(PowerUpType.InstantRepair))
+            {
+
             }
 
 
-            //commands = commands.Take(_maxCommandCount).ToList();
+            //use powerups
+
+
+
+
+            return commands;
         }
+
+        private void AddCommand( Command command)
+        {
+            if (command.action.Contains("powerup"))
+            {
+                _commands.Add(command);
+            }
+            else if (_commands.Count(a => !a.action.Contains("powerup")) <= _maxCommandCount)
+            {
+                _commands.Add(command);
+            }
+        }
+
+        
 
         // Do NOT modify or remove! This is where you will receive the new board status after each round.
         public void GetBoardStatus(BoardStatus board)
         {
             _currentBoard = board;
             _maxCommandCount = _currentBoard.MyVesselStatuses.Count(a => a.Health > 0) + 1;
+            _commands = new List<Command>(); 
         }
 
         // This method runs at the start of a new game, do any initialization or resetting here 
         public void Reset()
         {
-
+            _commands = new List<Command>(); 
         }
     }
+
 }
